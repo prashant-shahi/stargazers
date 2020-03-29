@@ -22,11 +22,19 @@ print(args)
 output_type = args.output_type
 out_file = args.out_file
 
+auth = (args.username, args.token)
+headers = { "Accept": "application/vnd.github.v3+json" }
+
+def get_user_details(user_obj):
+    response = get_request("{0}/users/{1}".format(GITHUB_API_URL, user_obj["login"]))
+    user_obj.update(response)
+    return user_obj
+
 def get_stargazers_count(owner, repo):
     response = get_request("{0}/repos/{1}/{2}".format(GITHUB_API_URL, owner, repo))
     return response["stargazers_count"]
     
-def get_request(url, auth=None, headers=None, params=None):
+def get_request(url, params=None):
     response = requests.get(url, auth=auth, headers=headers, params=params)
     response_json = response.json()
     if response.status_code != 200:
@@ -35,11 +43,9 @@ def get_request(url, auth=None, headers=None, params=None):
         sys.exit(1)
     return response_json
 
-def get_stargazers(owner, repo, username, token):
+def get_stargazers(owner, repo):
     total_stars = get_stargazers_count(owner, repo)
     total_requests = math.ceil(total_stars / 30)
-    auth = (username, token)
-    headers = { "Accept": "application/vnd.github.v3+json" }
     if output_type == "json":
         out_json=[]
     if output_type == "csv":
@@ -60,16 +66,28 @@ def get_stargazers(owner, repo, username, token):
             "repos_url","events_url",
             "received_events_url",
             "type",
-            "site_admin"
+            "site_admin",
+            "name",
+            "company",
+            "blog",
+            "location",
+            "email",
+            "hireable",
+            "bio",
+            "public_repos",
+            "public_gists",
+            "followers",
+            "following",
+            "created_at",
+            "updated_at"
         ])
     for i in range(1, total_requests+1):
         response = get_request(
             "{0}/repos/{1}/{2}/stargazers".format(GITHUB_API_URL, owner, repo),
-            auth=auth,
-            headers=headers,
             params={ "page": str(i) }
         )
         for user in response:
+            user = get_user_details(user)
             if output_type == "json":
                 out_json.append(user)
             elif output_type == "csv":
@@ -91,7 +109,20 @@ def get_stargazers(owner, repo, username, token):
                     user["events_url"],
                     user["received_events_url"],
                     user["type"],
-                    user["site_admin"]
+                    user["site_admin"],
+                    user["name"],
+                    user["company"],
+                    user["blog"],
+                    user["location"],
+                    user["email"],
+                    user["hireable"],
+                    user["bio"],
+                    user["public_repos"],
+                    user["public_gists"],
+                    user["followers"],
+                    user["following"],
+                    user["created_at"],
+                    user["updated_at"]
                 ])
     if output_type == "json":
         with open(out_file, 'w') as outfile:
@@ -101,5 +132,5 @@ def get_stargazers(owner, repo, username, token):
     print("{0} DONE {0}".format("*"*5))
 
 if __name__ == "__main__":
-    get_stargazers(args.owner, args.repo, args.username, args.token)
+    get_stargazers(args.owner, args.repo)
 
