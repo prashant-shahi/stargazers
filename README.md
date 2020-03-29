@@ -5,7 +5,7 @@ A small python project to obtain CSV/JSON of stargazers of any GitHub repository
 
 ### Usage
 
-```python
+```sh
 $ python stargazers.py --help
 
 usage: stargazers.py [-h] [--owner OWNER] [--repo REPO] [-u USERNAME]
