@@ -43,7 +43,7 @@ def get_stargazers(owner, repo, username, token):
     if output_type == "json":
         out_json=[]
     if output_type == "csv":
-        csv_writer = csv.writer(open("{0}.csv".format(out_file), "w"))
+        csv_writer = csv.writer(open("{0}".format(out_file), "w"))
         csv_writer.writerow([
             "login",
             "id",
