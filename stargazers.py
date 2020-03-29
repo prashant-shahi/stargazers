@@ -75,7 +75,6 @@ def get_stargazers(owner, repo, username, token):
             elif output_type == "csv":
                 csv_writer.writerow([
                     user["login"],
-                    user["login"],
                     user["id"],
                     user["node_id"],
                     user["avatar_url"],
